@@ -1,7 +1,7 @@
 # 🤖 AI Zalo OA Chatbot – Bếp Sạch Việt (Đặc sản chế biến sẵn)
 
 > Trợ lý AI tự động trả lời tin nhắn khách hàng trên Zalo OA thật
-> **Đề tài TTTN – B22DCCN050 – Học viện Công nghệ Bưu chính Viễn thông**
+> **Đề tài Thực tập tốt nghiệp**
 
 ---
 
@@ -161,8 +161,3 @@ Kết quả lần chạy gần nhất trên dữ liệu thật: **25/28 (89,3%)*
 - Chưa xác định được "OA Secret Key" đúng để verify chữ ký webhook (xem `ZALO_ENFORCE_WEBHOOK_SIGNATURE` ở trên).
 - Quota Gemini free tier thấp, ảnh hưởng độ chính xác của bước xác nhận fallback khi bị giới hạn.
 
----
-
-**Sinh viên**: Nông Quốc Ân – B22DCCN050
-**GVHD**: TS. Nguyễn Quang Hưng
-**Học viện**: Học viện Công nghệ Bưu chính Viễn thông

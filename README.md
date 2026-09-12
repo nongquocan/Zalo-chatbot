@@ -1,15 +1,15 @@
 # 🤖 AI Zalo OA Chatbot – Bếp Sạch Việt (Đặc sản chế biến sẵn)
 
-> Trợ lý AI tự động trả lời tin nhắn khách hàng trên Zalo OA  
+> Trợ lý AI tự động trả lời tin nhắn khách hàng trên Zalo OA thật
 > **Đề tài TTTN – B22DCCN050 – Học viện Công nghệ Bưu chính Viễn thông**
 
 ---
 
 ## 📋 Mô tả
 
-Hệ thống chatbot AI tích hợp **Zalo Official Account** với **Google Gemini 2.5 Flash** để tự động tư vấn và trả lời khách hàng cho **Bếp Sạch Việt** – shop chuyên đặc sản chế biến sẵn (vịt/gà/heo/cá ủ xì dầu, chả, ruốc, giò, nem...). Dự án đang ở giai đoạn **40% (Proof of Concept)** – các module core đã hoạt động, chờ tích hợp Zalo OA thật.
+Hệ thống chatbot AI tích hợp **Zalo Official Account thật** với **Google Gemini 2.5 Flash** để tự động tư vấn và trả lời khách hàng cho **Bếp Sạch Việt** ([bepsachviet.com](https://bepsachviet.com)) – công ty chuyên đặc sản chế biến sẵn (vịt/gà/heo ủ xì dầu-muối, chả, ruốc, giò, nem...). Chatbot đã **kết nối và chạy thật** trên Zalo OA của doanh nghiệp: nhận webhook, tự động làm mới access token, trả lời khách qua Zalo API thật.
 
-> Dữ liệu sản phẩm/giá lấy từ bảng báo giá đại lý thực tế của Bếp Sạch Việt (08/2026) và trang bepsachviet.com. Giá trong `products.json` là giá đại lý tham khảo – cần xác nhận lại giá bán lẻ chính thức với chủ shop trước khi vận hành thật.
+> Dữ liệu sản phẩm (60 SKU: giá gốc/giá khuyến mãi/tồn kho/đơn vị) lấy từ file Excel xuất bán hàng thật do chủ shop cung cấp (08/2026), mô tả sản phẩm đối chiếu với bài đăng Facebook chính thức của shop.
 
 ## 🏗️ Kiến trúc hệ thống
 
@@ -17,38 +17,50 @@ Hệ thống chatbot AI tích hợp **Zalo Official Account** với **Google Gem
 Khách hàng (Zalo)
       │
       ▼
-[Zalo OA API] ──webhook──► [FastAPI Server :8000]
+[Zalo OA API] ──webhook──► [FastAPI Server] ──ngrok tunnel──► Internet
                                    │
                      ┌─────────────┴─────────────┐
                      │                           │
-              [Gemini 2.5 Flash]        [Data Files (JSON)]
-                     │                  products / faq / shop_info
+              [Gemini 2.5 Flash]        [Data Files (JSON) + SQLite]
+                     │                  products / faq / shop_info /
+                     │                  conversations / orders / zalo_tokens
                      └────────────┬──────────────┘
                                   │
-                       [Trả lời → Khách hàng]
+                    [Trả lời khách qua Zalo OA API thật]
                                   │
-                       [Fallback → Người bán]
+                       [Fallback → Zalo chủ shop]
 ```
+
+Webhook xử lý bất đồng bộ: phản hồi Zalo `200 OK` ngay lập tức, xử lý Gemini/trả lời trong tác vụ nền (tránh timeout 2s của Zalo).
 
 ## 📁 Cấu trúc thư mục
 
 ```
 AI ZALO/
 ├── app/
-│   ├── main.py           # FastAPI app (webhook + mock-chat)
-│   ├── config.py         # Cấu hình từ .env
+│   ├── main.py           # FastAPI app (webhook, mock-chat, admin, stats)
+│   ├── config.py         # Cấu hình từ .env (bao gồm feature flags)
 │   ├── models.py         # Pydantic data models
-│   ├── gemini_client.py  # Gọi Gemini API
-│   ├── prompt_builder.py # Xây dựng system prompt
+│   ├── database.py       # SQLite: conversations, orders, analytics, zalo_tokens
+│   ├── gemini_client.py  # Gọi Gemini API + trích xuất đơn hàng
+│   ├── prompt_builder.py # Xây dựng system prompt từ data/*.json
 │   ├── conversation.py   # Quản lý lịch sử hội thoại
-│   ├── intent_handler.py # Phát hiện fallback intent
-│   └── zalo_client.py    # Gọi Zalo OA API
+│   ├── intent_handler.py # Phát hiện fallback intent (từ khóa + Gemini xác nhận)
+│   ├── zalo_client.py    # Gọi Zalo OA API + tự làm mới access token
+│   └── logger.py         # Cấu hình logging
 ├── data/
-│   ├── products.json     # 60 sản phẩm (lấy từ file Excel import sản phẩm thật của shop)
+│   ├── products.json     # 60 sản phẩm thật của Bếp Sạch Việt
 │   ├── faq.json          # Chính sách & FAQ
-│   └── shop_info.json    # Thông tin shop
+│   └── shop_info.json    # Thông tin công ty thật
+├── static/
+│   ├── chat.html          # Mock Chat UI để test không cần Zalo
+│   └── admin.html          # Dashboard thống kê/đơn hàng
+├── scripts/
+│   └── seed_data.py       # Script khởi tạo dữ liệu mẫu
 ├── tests/
-│   └── mock_webhook.py   # Script test hội thoại
+│   ├── mock_webhook.py    # Test nhanh 8 kịch bản
+│   └── test_suite.py      # Bộ test đầy đủ 28 kịch bản + đo thời gian phản hồi
+├── run.py                 # Chạy server + ngrok tunnel cùng lúc (dùng cho Zalo OA thật)
 ├── .env.example
 ├── requirements.txt
 └── README.md
@@ -59,6 +71,7 @@ AI ZALO/
 ### 1. Yêu cầu
 - Python 3.10+
 - Gemini API Key từ [Google AI Studio](https://aistudio.google.com/app/apikey) (miễn phí)
+- (Tuỳ chọn, để kết nối Zalo OA thật) App tạo trên [Zalo for Developers](https://developers.zalo.me), gắn với 1 Zalo OA thật
 
 ### 2. Cài đặt thư viện
 
@@ -69,103 +82,87 @@ pip install -r requirements.txt
 ### 3. Cấu hình môi trường
 
 ```bash
-# Sao chép file mẫu
 copy .env.example .env
-
-# Mở .env và điền GEMINI_API_KEY
 ```
 
-File `.env`:
-```
-GEMINI_API_KEY=AIza...  ← Dán API key vào đây
-```
+Mở `.env` và điền tối thiểu `GEMINI_API_KEY`. Muốn kết nối Zalo OA thật thì điền thêm `ZALO_APP_ID`, `ZALO_APP_SECRET`, `ZALO_REFRESH_TOKEN_SEED`, `ZALO_DOMAIN_VERIFICATION`, `NGROK_DOMAIN` — xem chú thích chi tiết trong `.env.example`.
 
 ### 4. Chạy server
 
 ```bash
+# Chỉ chạy server local, dùng Mock Chat UI để test — không cần Zalo OA
 python -m uvicorn app.main:app --reload
+
+# Hoặc chạy kèm ngrok tunnel để nhận webhook Zalo OA thật
+python run.py
 ```
 
-Server sẽ chạy tại: `http://localhost:8000`
+Server chạy tại `http://localhost:8000`; nếu dùng `run.py`, terminal sẽ in ra URL public (ngrok) để dán vào ô Webhook URL trên Zalo OA Admin.
+
+## 🚩 Feature flags (bật/tắt tính năng không cần sửa code)
+
+| Biến trong `.env` | Ý nghĩa |
+|---|---|
+| `ENABLE_AUTO_ORDER` | Bật/tắt việc AI tự trích xuất và xác nhận đơn hàng ngay trong chat. Đang tắt theo yêu cầu thực tế của Bếp Sạch Việt — chatbot tư vấn xong sẽ dẫn khách sang website/Zalo Mini App để đặt hàng, code trích xuất đơn hàng tự động vẫn giữ nguyên, sẵn sàng bật lại khi cần. |
+| `ZALO_ENFORCE_WEBHOOK_SIGNATURE` | Bật/tắt việc chặn cứng khi chữ ký webhook không khớp. Đang tắt vì chưa xác định được đúng "OA Secret Key" dùng để tính chữ ký (khác với App Secret Key) — mismatch vẫn được log lại để theo dõi. |
 
 ## 🧪 Kiểm thử
 
 ### Swagger UI (API docs)
-Mở trình duyệt: `http://localhost:8000/docs`
+`http://localhost:8000/docs`
 
-### Test qua mock-chat (không cần Zalo OA)
+### Mock Chat UI (không cần Zalo OA)
+`http://localhost:8000/chat`
+
+### Bộ test tự động
 
 ```bash
-# Terminal 1: Chạy server
-python -m uvicorn app.main:app --reload
-
-# Terminal 2: Chạy test demo (8 kịch bản)
+# Test nhanh 8 kịch bản
 python tests/mock_webhook.py
 
-# Hoặc bộ test đầy đủ (28 kịch bản + đo thời gian phản hồi, xuất tests/test_results.json)
+# Bộ test đầy đủ 28 kịch bản (14 nhóm tình huống) + đo thời gian phản hồi,
+# xuất kết quả ra tests/test_results.json
 python tests/test_suite.py
 ```
 
-> ⚠️ **Lưu ý về quota Gemini free tier**: API key free tier hiện bị giới hạn khá
-> thấp (quan sát thực tế: `quota_value: 20` request/ngày cho `gemini-2.5-flash`,
-> báo lỗi `429 ResourceExhausted`). Vì bước xác nhận fallback bằng Gemini (xem
-> mục dưới) tốn thêm 1 request cho các tin nhắn nghi ngờ, quota có thể hết rất
-> nhanh khi chạy `tests/test_suite.py` nhiều lần trong ngày hoặc demo trực tiếp
-> nhiều lượt. Khi hết quota, hệ thống tự động dùng lại kết quả lọc từ khóa làm
-> phương án dự phòng (không crash, chỉ giảm độ chính xác) — xem
-> `app/intent_handler.py::check_needs_fallback_smart`. Nên nâng cấp lên gói trả
-> phí hoặc dùng API key khác trước khi demo/nộp báo cáo để có kết quả ổn định.
+Kết quả lần chạy gần nhất trên dữ liệu thật: **25/28 (89,3%)** đạt, 0/28 lỗi 500, thời gian phản hồi trung bình ~6,4 giây (chưa tính lợi ích của xử lý webhook bất đồng bộ).
 
-### Test thủ công qua curl
-
-```bash
-curl -X POST http://localhost:8000/mock-chat \
-  -H "Content-Type: application/json" \
-  -d '{"user_id": "user001", "message": "Shop ơi ốp iPhone 15 giá bao nhiêu?"}'
-```
-
-## 🎯 Tiến độ hiện tại (Tháng 7)
-
-| Module | Trạng thái |
-|--------|-----------|
-| Cấu trúc dự án | ✅ Hoàn thành |
-| Dữ liệu sản phẩm mẫu (15 SP) | ✅ Hoàn thành |
-| Dữ liệu FAQ & chính sách shop | ✅ Hoàn thành |
-| FastAPI server + webhook endpoint | ✅ Hoàn thành |
-| Gemini 2.5 Flash integration | ✅ Hoàn thành |
-| System prompt builder | ✅ Hoàn thành |
-| Conversation history manager | ✅ Hoàn thành |
-| Mock chat endpoint (test) | ✅ Hoàn thành |
-| Fallback intent detection (từ khóa) | ✅ Hoàn thành |
-| Fallback intent detection (Gemini xác nhận, giảm false-positive) | ✅ Hoàn thành |
-| Gửi thông báo Zalo thật cho chủ shop khi fallback | ✅ Hoàn thành (code sẵn sàng, cần `ZALO_OA_TOKEN` + `ZALO_OWNER_ID` thật) |
-| Bộ test 28 câu + đo thời gian phản hồi | ✅ Hoàn thành (`tests/test_suite.py`) |
-| Zalo OA webhook thật | 🔲 Chờ đăng ký OA |
-| Gửi tin trả lời khách qua Zalo API thật | 🔲 Chờ OA token |
-| Báo cáo đánh giá kết quả | 🔲 Kế hoạch tháng tới |
+> ⚠️ **Lưu ý quota Gemini free tier**: quota thấp (quan sát thực tế ~20
+> request/ngày cho `gemini-2.5-flash`, lỗi `429 ResourceExhausted`). Bước xác
+> nhận fallback bằng Gemini tốn thêm 1 request mỗi tin nhắn nghi ngờ nên có
+> thể hết quota nhanh khi test nhiều lần liên tiếp. Khi hết quota, hệ thống tự
+> động lùi về kết quả lọc từ khóa (không crash, chỉ giảm độ chính xác) — xem
+> `app/intent_handler.py::check_needs_fallback_smart`.
 
 ## 📝 Kịch bản hội thoại hỗ trợ
 
 1. 📱 Hỏi giá sản phẩm, tình trạng còn hàng
-2. 🛒 Hỏi cách đặt hàng
-3. 💰 Hỏi phương thức thanh toán (CK/COD/MoMo)
+2. 🛒 Hỏi cách đặt hàng → dẫn khách sang website/Zalo Mini App
+3. 💰 Hỏi phương thức thanh toán (CK/COD)
 4. 🚚 Hỏi phí ship, thời gian giao hàng
-5. 🔄 Hỏi chính sách đổi trả, bảo hành
-6. ✅ Chốt đơn hàng – AI tóm tắt
-7. ⚠️ Khiếu nại/hàng lỗi → Chuyển người bán
+5. 🔄 Hỏi chính sách đổi trả, bảo quản
+6. ⚠️ Khiếu nại/hàng lỗi, hỏi giá sỉ → chuyển người bán (Zalo thật cho chủ shop)
 
 ## 🛠️ Tech Stack
 
 | Thành phần | Công nghệ |
 |-----------|-----------|
-| Backend | Python 3.10+, FastAPI |
-| LLM | Google Gemini 2.5 Flash |
-| Webhook | Zalo OA API v3 |
-| Dữ liệu | JSON files |
-| Môi trường | python-dotenv |
+| Backend | Python 3.10+, FastAPI, Uvicorn |
+| LLM | Google Gemini 2.5 Flash (`google-genai`) |
+| Zalo OA | Webhook + OAuth v4 + gửi tin nhắn (Zalo OA API) |
+| Tunnel | ngrok (`pyngrok`), domain tĩnh miễn phí |
+| Lưu trữ | SQLite (`chatbot.db`: conversations/orders/analytics/zalo_tokens) + JSON files (dữ liệu sản phẩm/FAQ) |
+| Import dữ liệu | `openpyxl` (đọc file Excel xuất bán hàng thật) |
+| Môi trường | python-dotenv / pydantic-settings |
+
+## 🔒 Giới hạn đã biết
+
+- Đang chạy qua ngrok (tunnel tạm), phù hợp demo/thực tập — nếu vận hành lâu dài nên triển khai lên server/tên miền cố định.
+- Chưa xác định được "OA Secret Key" đúng để verify chữ ký webhook (xem `ZALO_ENFORCE_WEBHOOK_SIGNATURE` ở trên).
+- Quota Gemini free tier thấp, ảnh hưởng độ chính xác của bước xác nhận fallback khi bị giới hạn.
 
 ---
 
-**Sinh viên**: Nông Quốc Ân – B22DCCN050  
-**GVHD**: TS. Nguyễn Quang Hưng  
+**Sinh viên**: Nông Quốc Ân – B22DCCN050
+**GVHD**: TS. Nguyễn Quang Hưng
 **Học viện**: Học viện Công nghệ Bưu chính Viễn thông

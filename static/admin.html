@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard – AI Zalo Chatbot</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-card-hover: #273549;
+            --border: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-blue: #3b82f6;
+            --accent-blue-glow: rgba(59, 130, 246, 0.15);
+            --accent-green: #22c55e;
+            --accent-green-glow: rgba(34, 197, 94, 0.15);
+            --accent-amber: #f59e0b;
+            --accent-amber-glow: rgba(245, 158, 11, 0.15);
+            --accent-red: #ef4444;
+            --accent-red-glow: rgba(239, 68, 68, 0.15);
+            --accent-purple: #a855f7;
+            --accent-purple-glow: rgba(168, 85, 247, 0.15);
+            --radius: 12px;
+            --shadow: 0 4px 24px rgba(0,0,0,0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, #162033 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header h1 .logo { font-size: 24px; }
+        .header .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .header .status .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+        }
+        .tab {
+            padding: 14px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab:hover { color: var(--text-secondary); }
+        .tab.active {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+        }
+
+        /* ── Content ── */
+        .content { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ── Stats Cards ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        .stat-card .label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        .stat-card .icon {
+            float: right;
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .stat-card.blue .value { color: var(--accent-blue); }
+        .stat-card.blue .icon { background: var(--accent-blue-glow); }
+        .stat-card.green .value { color: var(--accent-green); }
+        .stat-card.green .icon { background: var(--accent-green-glow); }
+        .stat-card.amber .value { color: var(--accent-amber); }
+        .stat-card.amber .icon { background: var(--accent-amber-glow); }
+        .stat-card.red .value { color: var(--accent-red); }
+        .stat-card.red .icon { background: var(--accent-red-glow); }
+        .stat-card.purple .value { color: var(--accent-purple); }
+        .stat-card.purple .icon { background: var(--accent-purple-glow); }
+
+        /* ── Tables ── */
+        .table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .table-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .table-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .table-header .badge {
+            background: var(--accent-blue-glow);
+            color: var(--accent-blue);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 12px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+        td {
+            padding: 14px 20px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(51,65,85,0.5);
+        }
+        tr:hover { background: var(--bg-card-hover); }
+        tr:last-child td { border-bottom: none; }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-pending { background: var(--accent-amber-glow); color: var(--accent-amber); }
+        .status-confirmed { background: var(--accent-blue-glow); color: var(--accent-blue); }
+        .status-shipped { background: var(--accent-purple-glow); color: var(--accent-purple); }
+        .status-delivered { background: var(--accent-green-glow); color: var(--accent-green); }
+        .status-cancelled { background: var(--accent-red-glow); color: var(--accent-red); }
+
+        /* ── Chat View ── */
+        .chat-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 16px;
+            height: calc(100vh - 200px);
+            min-height: 500px;
+        }
+        .user-list {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow-y: auto;
+        }
+        .user-list-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .user-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(51,65,85,0.3);
+            transition: background 0.2s;
+        }
+        .user-item:hover { background: var(--bg-card-hover); }
+        .user-item.active { background: var(--accent-blue-glow); border-left: 3px solid var(--accent-blue); }
+        .user-item .uid {
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-item .meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .chat-messages {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .chat-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .msg {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+        .msg.user {
+            align-self: flex-end;
+            background: var(--accent-blue);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .msg.assistant {
+            align-self: flex-start;
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+        .msg .time {
+            font-size: 10px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 4px;
+        }
+        .msg.assistant .time { color: var(--text-muted); }
+
+        /* ── Refresh Button ── */
+        .refresh-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .refresh-btn:hover { background: #2563eb; transform: translateY(-1px); }
+        .refresh-btn:active { transform: translateY(0); }
+        .refresh-btn.loading { opacity: 0.7; pointer-events: none; }
+
+        /* ── Period Selector ── */
+        .period-select {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* ── Loading Skeleton ── */
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 6px;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .content { padding: 16px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .chat-layout { grid-template-columns: 1fr; height: auto; }
+            .header { padding: 16px; }
+            .tabs { padding: 0 16px; overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1><span class="logo">🤖</span> Admin Dashboard</h1>
+    <div class="status">
+        <div class="dot"></div>
+        <span id="server-status">Đang kết nối...</span>
+    </div>
+</div>
+
+<div class="tabs">
+    <div class="tab active" data-tab="overview">📊 Tổng quan</div>
+    <div class="tab" data-tab="conversations">💬 Hội thoại</div>
+    <div class="tab" data-tab="orders">📦 Đơn hàng</div>
+</div>
+
+<div class="content">
+
+    <!-- ═══ TAB: Tổng quan ═══ -->
+    <div id="tab-overview" class="tab-panel active">
+        <div class="toolbar">
+            <select class="period-select" id="stats-period" onchange="loadStats()">
+                <option value="1">Hôm nay</option>
+                <option value="7" selected>7 ngày</option>
+                <option value="30">30 ngày</option>
+                <option value="90">90 ngày</option>
+            </select>
+            <button class="refresh-btn" onclick="loadStats()">🔄 Làm mới</button>
+        </div>
+
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card blue">
+                <div class="icon">💬</div>
+                <div class="label">Tin nhắn</div>
+                <div class="value" id="stat-messages">--</div>
+            </div>
+            <div class="stat-card green">
+                <div class="icon">👤</div>
+                <div class="label">Người dùng</div>
+                <div class="value" id="stat-users">--</div>
+            </div>
+            <div class="stat-card amber">
+                <div class="icon">⚠️</div>
+                <div class="label">Fallback</div>
+                <div class="value" id="stat-fallbacks">--</div>
+            </div>
+            <div class="stat-card purple">
+                <div class="icon">📦</div>
+                <div class="label">Đơn hàng</div>
+                <div class="value" id="stat-orders">--</div>
+            </div>
+        </div>
+
+        <div class="table-container" id="recent-users-table">
+            <div class="table-header">
+                <h3>👤 Người dùng gần đây</h3>
+                <span class="badge" id="users-count">0 users</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Số tin nhắn</th>
+                        <th>Hoạt động cuối</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="users-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Hội thoại ═══ -->
+    <div id="tab-conversations" class="tab-panel">
+        <div class="chat-layout">
+            <div class="user-list">
+                <div class="user-list-header">📋 Danh sách người dùng</div>
+                <div id="chat-user-list"></div>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="chat-empty">Chọn người dùng bên trái để xem hội thoại</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: Đơn hàng ═══ -->
+    <div id="tab-orders" class="tab-panel">
+        <div class="toolbar">
+            <select class="period-select" id="order-status-filter" onchange="loadOrders()">
+                <option value="">Tất cả trạng thái</option>
+                <option value="pending">Chờ xử lý</option>
+                <option value="confirmed">Đã xác nhận</option>
+                <option value="shipped">Đang giao</option>
+                <option value="delivered">Đã giao</option>
+                <option value="cancelled">Đã hủy</option>
+            </select>
+            <button class="refresh-btn" onclick="loadOrders()">🔄 Làm mới</button>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h3>📦 Danh sách đơn hàng</h3>
+                <span class="badge" id="orders-count">0 đơn</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Khách hàng</th>
+                        <th>Sản phẩm</th>
+                        <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ── API helpers ──
+const API = {
+    async get(url) {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    }
+};
+
+// ── Tab switching ──
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+
+        // Load data when switching
+        if (tab.dataset.tab === 'conversations') loadChatUsers();
+        if (tab.dataset.tab === 'orders') loadOrders();
+    });
+});
+
+// ── Stats ──
+async function loadStats() {
+    const days = document.getElementById('stats-period').value;
+    try {
+        const data = await API.get(`/stats?days=${days}`);
+        document.getElementById('stat-messages').textContent = data.total_messages;
+        document.getElementById('stat-users').textContent = data.unique_users;
+        document.getElementById('stat-fallbacks').textContent = data.total_fallbacks;
+        document.getElementById('stat-orders').textContent = data.total_orders;
+    } catch (e) {
+        console.error('Load stats error:', e);
+    }
+
+    // Load recent users
+    try {
+        const users = await API.get('/api/conversations?limit=20');
+        renderRecentUsers(users);
+    } catch (e) {
+        console.error('Load users error:', e);
+    }
+}
+
+function renderRecentUsers(data) {
+    const tbody = document.getElementById('users-tbody');
+    document.getElementById('users-count').textContent = `${data.total} users`;
+
+    if (!data.users || data.users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">Chưa có dữ liệu</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = data.users.map(u => `
+        <tr>
+            <td style="font-family:monospace;font-size:13px">${u.user_id}</td>
+            <td>${u.message_count}</td>
+            <td style="color:var(--text-secondary)">${formatTime(u.last_active)}</td>
+            <td>
+                <button class="refresh-btn" style="padding:4px 12px;font-size:12px"
+                    onclick="viewUserChat('${u.user_id}')">Xem chat</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// ── Conversations ──
+async function loadChatUsers() {
+    try {
+        const data = await API.get('/api/conversations?limit=50');
+        const container = document.getElementById('chat-user-list');
+
+        if (!data.users || data.users.length === 0) {
+            container.innerHTML = '<div style="padding:16px;color:var(--text-muted);font-size:13px">Chưa có hội thoại</div>';
+            return;
+        }
+
+        container.innerHTML = data.users.map(u => `
+            <div class="user-item" onclick="loadChat('${u.user_id}', this)">
+                <div class="uid">👤 ${u.user_id}</div>
+                <div class="meta">${u.message_count} tin nhắn • ${formatTime(u.last_active)}</div>
+            </div>
+        `).join('');
+    } catch (e) {
+        console.error('Load chat users error:', e);
+    }
+}
+
+async function loadChat(userId, el) {
+    // Highlight selected user
+    document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
+    if (el) el.classList.add('active');
+
+    const container = document.getElementById('chat-messages');
+    container.innerHTML = '<div class="chat-empty">Đang tải...</div>';
+
+    try {
+        const data = await API.get(`/api/conversations?user_id=${userId}&limit=100`);
+
+        if (!data.messages || data.messages.length === 0) {
+            container.innerHTML = '<div class="chat-empty">Không có tin nhắn</div>';
+            return;
+        }
+
+        container.innerHTML = data.messages.map(m => `
+            <div class="msg ${m.role}">
+                ${escapeHtml(m.content)}
+                <div class="time">${formatTime(m.created_at)}</div>
+            </div>
+        `).join('');
+
+        // Scroll to bottom
+        container.scrollTop = container.scrollHeight;
+    } catch (e) {
+        container.innerHTML = '<div class="chat-empty">Lỗi tải dữ liệu</div>';
+        console.error('Load chat error:', e);
+    }
+}
+
+function viewUserChat(userId) {
+    // Switch to conversations tab and load this user's chat
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelector('[data-tab="conversations"]').classList.add('active');
+    document.getElementById('tab-conversations').classList.add('active');
+
+    loadChatUsers().then(() => {
+        loadChat(userId);
+    });
+}
+
+// ── Orders ──
+async function loadOrders() {
+    const status = document.getElementById('order-status-filter').value;
+    const url = status ? `/orders?status=${status}` : '/orders';
+
+    try {
+        const data = await API.get(url);
+        const tbody = document.getElementById('orders-tbody');
+        document.getElementById('orders-count').textContent = `${data.total} đơn`;
+
+        if (data.total === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted)">Chưa có đơn hàng</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.orders.map(o => `
+            <tr>
+                <td style="font-weight:600">#${o.id}</td>
+                <td>${o.user_name || o.user_id}</td>
+                <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    ${Array.isArray(o.products) ? o.products.map(p => p.name || p).join(', ') : o.products}
+                </td>
+                <td style="font-weight:600">${formatMoney(o.total_amount)}</td>
+                <td>${o.payment_method || '—'}</td>
+                <td><span class="status-badge status-${o.status}">${statusLabel(o.status)}</span></td>
+                <td style="color:var(--text-secondary)">${formatTime(o.created_at)}</td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        console.error('Load orders error:', e);
+    }
+}
+
+// ── Utilities ──
+function formatTime(ts) {
+    if (!ts) return '—';
+    const d = new Date(ts + 'Z'); // SQLite timestamps are UTC
+    const now = new Date();
+    const diff = now - d;
+
+    if (diff < 60000) return 'Vừa xong';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)} phút trước`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)} giờ trước`;
+    if (diff < 604800000) return `${Math.floor(diff / 86400000)} ngày trước`;
+    return d.toLocaleDateString('vi-VN');
+}
+
+function formatMoney(amount) {
+    if (!amount) return '0đ';
+    return amount.toLocaleString('vi-VN') + 'đ';
+}
+
+function statusLabel(status) {
+    const labels = {
+        pending: 'Chờ xử lý',
+        confirmed: 'Đã xác nhận',
+        shipped: 'Đang giao',
+        delivered: 'Đã giao',
+        cancelled: 'Đã hủy',
+    };
+    return labels[status] || status;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ── Health check + initial load ──
+async function checkHealth() {
+    try {
+        const data = await API.get('/health');
+        const statusEl = document.getElementById('server-status');
+        if (data.status === 'ok') {
+            statusEl.textContent = `Online • Gemini ${data.gemini_configured ? '✅' : '❌'} • Zalo ${data.zalo_configured ? '✅' : '❌'}`;
+        }
+    } catch (e) {
+        document.getElementById('server-status').textContent = 'Mất kết nối';
+    }
+}
+
+// Initial load
+checkHealth();
+loadStats();
+</script>
+
+</body>
+</html>

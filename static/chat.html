@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zalo Demo - AI Chatbot</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        :root {
+            --zalo-blue: #0068ff;
+            --zalo-bg: #e2e8f0;
+            --msg-user: #e5efff;
+            --msg-bot: #ffffff;
+            --text-main: #081c36;
+            --text-secondary: #7589a3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 400px; /* Kích thước màn hình điện thoại */
+            height: 100vh;
+            max-height: 800px;
+            background-color: var(--zalo-bg);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        @media (min-width: 480px) {
+            .chat-container {
+                height: 90vh;
+                border-radius: 20px;
+                overflow: hidden;
+            }
+        }
+
+        /* --- Header --- */
+        .header {
+            background-color: var(--zalo-blue);
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .back-btn {
+            font-size: 24px;
+            cursor: pointer;
+            width: 24px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .shop-info {
+            flex-grow: 1;
+        }
+
+        .shop-name {
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .tick {
+            background-color: #f5a623;
+            color: white;
+            font-size: 10px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .status {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 16px;
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        /* --- Chat Area --- */
+        .messages {
+            flex-grow: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .msg-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .msg-row.user {
+            justify-content: flex-end;
+        }
+
+        .msg-bubble {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.4;
+            color: var(--text-main);
+            position: relative;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .msg-row.user .msg-bubble {
+            background-color: var(--msg-user);
+            border-top-right-radius: 2px;
+        }
+
+        .msg-row.bot .msg-bubble {
+            background-color: var(--msg-bot);
+            border-top-left-radius: 2px;
+        }
+
+        .msg-time {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        /* System Messages / Fallback */
+        .msg-system {
+            align-self: center;
+            background-color: rgba(0,0,0,0.1);
+            color: #4a5568;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            margin: 8px 0;
+            text-align: center;
+        }
+
+        /* Typing indicator */
+        .typing {
+            display: none;
+            padding: 12px 16px;
+            background-color: var(--msg-bot);
+            border-radius: 8px;
+            border-top-left-radius: 2px;
+            width: fit-content;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--text-secondary);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* --- Input Area --- */
+        .input-area {
+            background-color: white;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .icon-btn {
+            font-size: 22px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .input-wrapper {
+            flex-grow: 1;
+            background-color: #f1f5f9;
+            border-radius: 20px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-size: 15px;
+            outline: none;
+            color: var(--text-main);
+        }
+        
+        input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .send-btn {
+            color: var(--zalo-blue);
+            font-size: 24px;
+            cursor: pointer;
+            display: none; /* Chỉ hiện khi có chữ */
+        }
+        
+        .send-btn.active {
+            display: block;
+        }
+        .mic-btn.hidden {
+            display: none;
+        }
+
+        /* Config Modal */
+        #config-modal {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        #config-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: white;
+            width: 85%;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+        .modal-input {
+            width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;
+            margin-bottom: 16px; font-size: 14px; outline: none;
+        }
+        .modal-input:focus { border-color: var(--zalo-blue); }
+        .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+        .btn { padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; }
+        .btn-cancel { background: #e2e8f0; color: #475569; }
+        .btn-save { background: var(--zalo-blue); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <!-- Header -->
+    <div class="header">
+        <div class="back-btn">⟨</div>
+        <div class="avatar">🍗</div>
+        <div class="shop-info">
+            <div class="shop-name" id="shop-name-display">
+                Bếp Sạch Việt <span class="tick">✔</span>
+            </div>
+            <div class="status">Đang hoạt động</div>
+        </div>
+        <div class="header-actions">
+            <div onclick="openConfig()">⚙️</div>
+            <div onclick="resetChat()" title="Xóa lịch sử chat">🔄</div>
+        </div>
+    </div>
+
+    <!-- Chat Messages -->
+    <div class="messages" id="chat-messages">
+        <div class="msg-system">Hôm nay</div>
+        
+        <div class="msg-row bot">
+            <div class="msg-bubble">
+                Dạ shop Bếp Sạch Việt chào bạn! Bạn đang muốn tìm món đặc sản nào ạ? 😊
+                <div class="msg-time" id="welcome-time"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Typing indicator -->
+    <div class="msg-row bot" id="typing-indicator" style="display: none; margin: 0 16px 16px 16px;">
+        <div class="typing" style="display: block;">
+            <div class="typing-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input -->
+    <div class="input-area">
+        <div class="icon-btn">+</div>
+        <div class="icon-btn">😊</div>
+        <div class="input-wrapper">
+            <input type="text" id="msg-input" placeholder="Tin nhắn..." autocomplete="off">
+        </div>
+        <div class="icon-btn mic-btn" id="mic-btn">🎙️</div>
+        <div class="icon-btn send-btn" id="send-btn" onclick="sendMessage()">➤</div>
+    </div>
+
+    <!-- Config Modal -->
+    <div id="config-modal">
+        <div class="modal-content">
+            <div class="modal-title">Cấu hình Tester</div>
+            <label style="font-size: 13px; color: #475569; margin-bottom: 6px; display: block;">Tên của bạn (hiển thị cho AI biết):</label>
+            <input type="text" id="user-name-input" class="modal-input" placeholder="Ví dụ: Nam, Lan, Khách hàng...">
+            
+            <label style="font-size: 13px; color: #475569; margin-bottom: 6px; display: block;">Tester ID (để lưu lịch sử riêng):</label>
+            <input type="text" id="user-id-input" class="modal-input" placeholder="test_user_01">
+            
+            <div class="modal-btns">
+                <button class="btn btn-cancel" onclick="closeConfig()">Hủy</button>
+                <button class="btn btn-save" onclick="saveConfig()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Config state
+    let currentUser = {
+        id: localStorage.getItem('tester_id') || 'test_user_' + Math.floor(Math.random() * 10000),
+        name: localStorage.getItem('tester_name') || 'Khách Hàng Test'
+    };
+
+    // DOM Elements
+    const chatMessages = document.getElementById('chat-messages');
+    const msgInput = document.getElementById('msg-input');
+    const sendBtn = document.getElementById('send-btn');
+    const micBtn = document.getElementById('mic-btn');
+    const typingIndicator = document.getElementById('typing-indicator');
+
+    // Init time
+    document.getElementById('welcome-time').textContent = getCurrentTime();
+
+    // Input behavior (show send button only when there's text)
+    msgInput.addEventListener('input', function() {
+        if (this.value.trim().length > 0) {
+            sendBtn.classList.add('active');
+            micBtn.classList.add('hidden');
+        } else {
+            sendBtn.classList.remove('active');
+            micBtn.classList.remove('hidden');
+        }
+    });
+
+    // Enter to send
+    msgInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    function getCurrentTime() {
+        const now = new Date();
+        return now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    }
+
+    function addMessage(text, sender, isSystem = false) {
+        const row = document.createElement('div');
+        
+        if (isSystem) {
+            row.className = 'msg-system';
+            row.textContent = text;
+        } else {
+            row.className = `msg-row ${sender}`;
+            row.innerHTML = `
+                <div class="msg-bubble">
+                    ${escapeHtml(text)}
+                    <div class="msg-time">${getCurrentTime()}</div>
+                </div>
+            `;
+        }
+        
+        chatMessages.appendChild(row);
+        scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        // Cuộn xuống cuối (tính cả typing indicator nếu nó đang hiện)
+        const container = chatMessages.parentElement;
+        setTimeout(() => {
+            container.scrollTop = container.scrollHeight;
+        }, 50);
+    }
+
+    async function sendMessage() {
+        const text = msgInput.value.trim();
+        if (!text) return;
+
+        // Xóa input
+        msgInput.value = '';
+        sendBtn.classList.remove('active');
+        micBtn.classList.remove('hidden');
+
+        // Hiện tin nhắn user
+        addMessage(text, 'user');
+
+        // Hiện typing indicator
+        typingIndicator.style.display = 'flex';
+        scrollToBottom();
+
+        try {
+            // Gọi API
+            const response = await fetch('/mock-chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: currentUser.id,
+                    user_name: currentUser.name,
+                    message: text
+                })
+            });
+
+            const data = await response.json();
+            
+            // Ẩn typing
+            typingIndicator.style.display = 'none';
+
+            // Hiện tin nhắn bot
+            if (data.reply) {
+                addMessage(data.reply, 'bot');
+            }
+
+            // Nếu bot nhận diện cần fallback
+            if (data.needs_human) {
+                setTimeout(() => {
+                    addMessage('⚠️ Shop đã nhận được thông báo hỗ trợ từ bạn và sẽ trả lời sớm nhất.', 'system', true);
+                }, 500);
+            }
+
+        } catch (error) {
+            typingIndicator.style.display = 'none';
+            addMessage('Lỗi kết nối đến máy chủ. Vui lòng kiểm tra lại!', 'system', true);
+            console.error(error);
+        }
+    }
+
+    async function resetChat() {
+        if (!confirm('Bạn có chắc muốn xóa lịch sử chat của user này không?')) return;
+        
+        try {
+            await fetch(`/mock-chat/${currentUser.id}`, { method: 'DELETE' });
+            chatMessages.innerHTML = `<div class="msg-system">Lịch sử chat đã được làm mới</div>`;
+            addMessage('Dạ shop chào bạn! Bạn cần tư vấn gì ạ?', 'bot');
+        } catch (error) {
+            alert('Lỗi khi xóa lịch sử');
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Config Modal Logic
+    function openConfig() {
+        document.getElementById('user-name-input').value = currentUser.name;
+        document.getElementById('user-id-input').value = currentUser.id;
+        document.getElementById('config-modal').classList.add('show');
+    }
+
+    function closeConfig() {
+        document.getElementById('config-modal').classList.remove('show');
+    }
+
+    function saveConfig() {
+        const newName = document.getElementById('user-name-input').value.trim();
+        const newId = document.getElementById('user-id-input').value.trim();
+        
+        if (newName && newId) {
+            currentUser.name = newName;
+            currentUser.id = newId;
+            localStorage.setItem('tester_name', newName);
+            localStorage.setItem('tester_id', newId);
+            closeConfig();
+            
+            // Xóa UI chat hiện tại vì chuyển user khác
+            chatMessages.innerHTML = `<div class="msg-system">Đang chat dưới tên: ${newName}</div>`;
+            addMessage('Dạ shop chào bạn! Bạn cần tư vấn gì ạ?', 'bot');
+        } else {
+            alert('Vui lòng nhập đủ thông tin');
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,65 @@
+{
+  "return_policy": {
+    "title": "Chính sách kiểm tra & đổi trả",
+    "details": [
+      "Khách được kiểm tra hàng trước khi thanh toán (COD) hoặc ngay khi nhận hàng.",
+      "Đổi trả miễn phí nếu sản phẩm bị lỗi từ khâu chế biến/đóng gói của shop (thiếu cân, sai món, bao bì rách/hở khi giao).",
+      "Không áp dụng đổi trả nếu sản phẩm đã sử dụng, đã rã đông quá lâu hoặc bảo quản sai cách sau khi nhận (không để trong ngăn mát/ngăn đông đúng hướng dẫn).",
+      "Với hàng đông lạnh: nếu phát hiện sản phẩm có dấu hiệu bất thường (mùi lạ, đổi màu) ngay khi mở gói lần đầu, báo shop trong vòng 24h kèm ảnh/video để được xử lý."
+    ],
+    "process": "Liên hệ shop qua Zalo/hotline → Gửi ảnh/video sản phẩm → Shop xác nhận lỗi → Đổi sản phẩm mới hoặc hoàn tiền tương ứng"
+  },
+  "storage_policy": {
+    "title": "Hướng dẫn bảo quản chung",
+    "details": [
+      "Phần lớn sản phẩm chế biến sẵn (vịt, gà, chả, mọc, tai heo...): bảo quản ngăn mát 2-5°C dùng trong khoảng 15 ngày, hoặc ngăn đông -18°C dùng được khoảng 6 tháng.",
+      "Các loại ruốc và mắm tép chưng thịt: hàng thủ công không chất bảo quản nên cần bảo quản ngăn mát 10-15 ngày, hoặc ngăn đá dùng được đến 180 ngày.",
+      "Sản phẩm đông lạnh nên rã đông tự nhiên trong ngăn mát trước khi chế biến, không rã đông ở nhiệt độ phòng quá lâu.",
+      "Thời hạn cụ thể có thể in trên bao bì từng sản phẩm – ưu tiên theo thông tin in trên bao bì thực tế nếu có sai khác."
+    ]
+  },
+  "shipping_policy": {
+    "title": "Chính sách vận chuyển",
+    "details": [
+      "Miễn phí giao hàng trong bán kính 5km cho đơn hàng từ 5kg trở lên.",
+      "Đơn dưới 5kg hoặc ngoài bán kính 5km: shop báo phí ship cụ thể khi chốt đơn, tùy khoảng cách thực tế.",
+      "Hàng đông lạnh/hàng tươi được đóng gói giữ lạnh (túi giữ nhiệt/đá gel) trong quá trình vận chuyển để đảm bảo chất lượng.",
+      "Khu vực nội thành gần kho: giao trong ngày. Khu vực xa hoặc tỉnh khác: liên hệ shop để xác nhận thời gian giao cụ thể."
+    ]
+  },
+  "payment_faq": {
+    "title": "Câu hỏi về thanh toán",
+    "questions": [
+      {
+        "q": "Có thanh toán khi nhận hàng (COD) không?",
+        "a": "Có, shop hỗ trợ COD. Bạn kiểm tra hàng xong mới thanh toán."
+      },
+      {
+        "q": "Có thể chuyển khoản trước không?",
+        "a": "Có. Chuyển khoản theo thông tin shop cung cấp khi chốt đơn, gửi xác nhận là shop xử lý đơn ngay."
+      }
+    ]
+  },
+  "general_faq": [
+    {
+      "q": "Giá sản phẩm có cố định không?",
+      "a": "Với các sản phẩm bán theo cân/con (vịt, gà, tai heo cuốn lưỡi...), giá có thể dao động nhẹ theo trọng lượng thực tế của từng con/miếng. Shop sẽ báo giá chính xác khi khách chốt số lượng cụ thể."
+    },
+    {
+      "q": "Sản phẩm có phải hàng tươi chế biến sẵn không?",
+      "a": "Đúng vậy, các sản phẩm đều là đặc sản chế biến sẵn (đã tẩm ướp/ủ/hấp theo công thức truyền thống), khách chỉ cần rã đông và hâm/chiên/hấp lại là dùng được."
+    },
+    {
+      "q": "Đặt hàng như thế nào?",
+      "a": "Nhắn tên món và số lượng/trọng lượng mong muốn kèm địa chỉ giao hàng → Shop xác nhận còn hàng, báo giá chính xác → Bạn chọn hình thức thanh toán → Shop đóng gói giữ lạnh và giao hàng."
+    },
+    {
+      "q": "Có nhận đặt sỉ/đại lý không?",
+      "a": "Có, shop có chính sách giá riêng cho đại lý/mua số lượng lớn. Vui lòng để lại thông tin, shop sẽ liên hệ tư vấn giá sỉ."
+    },
+    {
+      "q": "Ở xa có đặt được không?",
+      "a": "Khu vực ngoài bán kính giao hàng miễn phí của shop, bạn liên hệ trực tiếp để shop kiểm tra khả năng và chi phí vận chuyển phù hợp."
+    }
+  ]
+}

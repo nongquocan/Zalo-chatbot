@@ -1,0 +1,38 @@
+{
+  "shop_name": "Bếp Sạch Việt",
+  "company_name": "Công ty TNHH Bếp Sạch Việt",
+  "tax_code": "0110307650",
+  "slogan": "Mang hương vị vùng miền đến bếp nhà bạn",
+  "description": "Bếp Sạch Việt chuyên cung cấp đặc sản chế biến sẵn từ vịt, gà, heo, cá, hải sản và các loại ruốc, giò chả truyền thống các vùng miền – sạch, an toàn, tiện chế biến, giao tận nơi tại Hà Nội.",
+  "website": "https://bepsachviet.com",
+  "order_website_url": "https://bepsachviet.com/",
+  "order_zalo_miniapp_url": "https://zalo.me/s/2155009251277567787?csid=lcjeEhf0C&ref=84902898372",
+  "office_address": "Nhà số 2, ngõ 91, phố Tam Khương, phường Khương Thượng, quận Đống Đa, Hà Nội",
+  "store_address": "29 Nguyễn Viết Xuân, Khương Mai, Thanh Xuân, Hà Nội",
+  "phone": "0868.839.655",
+  "phone_alt": "0963.538.357",
+  "email": "bepsachviet@gmail.com",
+  "facebook": "fb.com/bepsachvietOfficial",
+  "working_hours": {
+    "daily": "08:00 – 21:00 (tất cả các ngày trong tuần, kể cả cuối tuần)",
+    "note": "Hotline hỗ trợ 24/7, ngoài giờ hành chính sẽ phản hồi sớm nhất có thể"
+  },
+  "payment_methods": [
+    {
+      "method": "Tiền mặt (COD)",
+      "details": "Thanh toán khi nhận hàng, kiểm tra hàng trước khi trả tiền"
+    },
+    {
+      "method": "Chuyển khoản ngân hàng",
+      "details": "Chuyển khoản trước, shop xử lý và giao đơn ngay sau khi nhận được xác nhận"
+    }
+  ],
+  "shipping": {
+    "free_ship_radius_km": 5,
+    "free_ship_min_weight_kg": 5,
+    "free_ship_note": "Miễn phí giao hàng trong bán kính 5km cho đơn hàng từ 5kg trở lên",
+    "other_orders_note": "Đơn không đủ điều kiện miễn phí ship (dưới 5kg hoặc ngoài bán kính 5km) sẽ được báo phí ship cụ thể khi chốt đơn, tùy khoảng cách",
+    "delivery_time": "Giao trong ngày với khu vực nội thành Hà Nội gần kho; khu vực xa hơn hoặc tỉnh thành khác cần liên hệ shop để xác nhận thời gian giao"
+  },
+  "order_process": "Chatbot chỉ tư vấn sản phẩm/giá/chính sách, KHÔNG nhận đặt hàng trực tiếp qua chat. Khách muốn mua được hướng dẫn đặt hàng qua website hoặc Zalo Mini App (đặt qua Mini App được tích điểm và ưu đãi)."
+}

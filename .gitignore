@@ -216,3 +216,27 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ====== Loại trừ riêng cho dự án (không đẩy lên GitHub) ======
+# Secrets / cấu hình thật
+.env
+
+# Database thật (chứa dữ liệu hội thoại/khách hàng thật)
+data/chatbot.db
+data/*.db
+
+# Log hệ thống (có thể chứa nội dung tin nhắn khách thật)
+logs/
+
+# Báo cáo, thuyết trình, hướng dẫn nội bộ — không phải code
+bai_thuyet_trinh.md
+HUONG_DAN_VAN_HANH.md
+*.docx
+\#1_Bao gia DL_BSV.xlsx - Báo giá_Tiếp.pdf
+24e622731c52d638310ecacc084d751e.xlsx
+
+# Ảnh chụp màn hình dùng cho báo cáo
+images/
+
+# Config IDE cục bộ
+.claude/
